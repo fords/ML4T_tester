@@ -13,7 +13,7 @@ def compute_daily_returns(df):
 	#daily_return = daily_retuns[1:]
 	#for each in daily_return:
 	#	print each
-    daily_returns.ix[0,0] = 0
+    # daily_returns.ix[0,0] = 0
     return daily_returns
 
 def compute_cumu_returns(df):
@@ -62,7 +62,7 @@ def assess_portfolio(sd = dt.datetime(2008,1,1), ed = dt.datetime(2009,1,1), \
     cr = (port_val.ix[-1,:]/port_val.ix[0,:])  -1
     daily_rets = []
     daily_rets = compute_daily_returns(port_val)
-    #daily_rets = daily_rets[1:]         # daily returns
+    daily_rets = daily_rets[1:]         # daily returns
 
     #if sf == 252:
     #    #average daily returns mean
