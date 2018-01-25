@@ -71,9 +71,9 @@ def assess_portfolio(sd = dt.datetime(2008,1,1), ed = dt.datetime(2009,1,1), \
     adr = daily_rets.mean()
 
     sddr = daily_rets.std()   # standard deviation daily return
-    difference = sddr - rfr
-    mean = difference.mean()
-    sr =  np.sqrt(sf)* mean/sddr                  #sharpe ratio
+    difference = daily_rets - rfr
+    mean_val = difference.mean()
+    sr =  np.sqrt(sf)* mean_val/sddr                  #sharpe ratio
 
     # Compare daily portfolio value with SPY using a normalized plot
 
