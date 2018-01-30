@@ -114,7 +114,6 @@ def optimize_portfolio(sd=dt.datetime(2008,1,1), ed=dt.datetime(2009,1,1), \
     for i in range(0,no_syms):
         bnds_list.append(b)
     bnds = tuple(bnds_list)
-    print bnds
     con1 = {'type': 'eq', 'fun': constraint} #, bounds=(0.0,1.0)
     res = minimize(f,allocations, method = 'SLSQP',bounds=bnds,constraints = con1)
     #print res
