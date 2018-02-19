@@ -10,7 +10,7 @@ import math
 class DTLearner(object):
 
     def __init__(self, leaf_size=1, verbose = False):
-        warnings.warn("\n\n  WARNING! THIS IS NOT A CORRECT DTLearner IMPLEMENTATION! REPLACE WITH YOUR OWN CODE\n")
+        self.leaf_size = leaf_size
         pass # move along, these aren't the drones you're looking for
 
     def author(self):
