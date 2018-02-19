@@ -17,7 +17,7 @@ def best4LinReg(seed=1489683273):
     X = np.random.normal(size=(np.random.randint(10, 100), np.random.randint(5, 100)))
     Y = np.zeros(np.random.randint(10, 100))
     for j in range(np.random.randint(5, 100)):
-        Y = Y + X[:, j]
+        Y += X[:, j]
     return X, Y
 
 def best4DT(seed=1489683273):
@@ -27,7 +27,7 @@ def best4DT(seed=1489683273):
     X = np.random.normal(size=(np.random.randint(10, 100), np.random.randint(5, 100)))
     Y = np.zeros(np.random.randint(10, 100))
     for j in range( np.random.randint(5, 100)):
-        Y = Y + X[:, j] ** 2
+        Y += X[:, j] ** 2
     return X, Y
 
 def author():
