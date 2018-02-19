@@ -14,8 +14,8 @@ def best4LinReg(seed=1489683273):
     # Here's is an example of creating a Y from randomly generated
     # X with multiple columns
     # Y = X[:,0] + np.sin(X[:,1]) + X[:,2]**2 + X[:,3]**3
-    rows = np.random.randint(10, 500)
-    cols = np.random.randint(5, 500)
+    rows = np.random.randint(10, 1001)
+    cols = np.random.randint(2, 1001)
     X = np.random.normal(size=(rows, cols))
     Y = np.zeros(rows)
     for j in range(0,cols):
@@ -26,8 +26,8 @@ def best4DT(seed=1489683273):
     np.random.seed(seed)
     #X = np.zeros((100,2))
     #Y = np.random.random(size = (100,))*200-100
-    rows = np.random.randint(10, 500)
-    cols = np.random.randint(5, 500)
+    rows = np.random.randint(10, 1001)
+    cols = np.random.randint(2, 1001)
     X = np.random.normal(size=(rows, cols))
     Y = np.zeros(rows)
     for col in range(0,cols):
