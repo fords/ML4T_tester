@@ -10,7 +10,7 @@ class LinRegLearner(object):
         pass # move along, these aren't the drones you're looking for
 
     def author(self):
-        return 'tb34' # replace tb34 with your Georgia Tech username
+        return 'zwin3' # replace tb34 with your Georgia Tech username
 
     def addEvidence(self,dataX,dataY):
         """
@@ -25,7 +25,7 @@ class LinRegLearner(object):
 
         # build and save the model
         self.model_coefs, residuals, rank, s = np.linalg.lstsq(newdataX, dataY)
-        
+
     def query(self,points):
         """
         @summary: Estimate a set of test points given the model we built.
