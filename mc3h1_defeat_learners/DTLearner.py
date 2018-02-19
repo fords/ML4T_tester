@@ -23,7 +23,7 @@ class DTLearner(object):
         @param dataY: the Y training values
         """
         self.model = np.array([]).reshape((0,4))
-        data = np.column_stack((x, y))
+        data = np.column_stack((dataX, dataY))
         self.model = np.concatenate([self.model, self.createDT(data)], axis=0)
         # slap on 1s column so linear regression finds a constant term
         #newdataX = np.ones([dataX.shape[0],dataX.shape[1]+1])
