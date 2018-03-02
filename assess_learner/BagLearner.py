@@ -4,7 +4,7 @@ import LinRegLearner, DTLearner, RTLearner
 
 class BagLearner(object):
 
-    def __init__(self, learner, bags=20, boost=False, verbose=False, **kwargs):
+    def __init__(self, learner,kwargs, bags=20, boost=False, verbose=False ):
         """Initalize a Bag Learner
         Parameters:
         learner: A LinRegLearner, DTLearner, or RTLearner
@@ -18,7 +18,7 @@ class BagLearner(object):
         self.verbose = verbose
         learners = []
         for i in range(bags):
-            learners.append(learner(**kwargs))
+            learners.append(learner(kwargs))
         self.learners = learners
         self.kwargs = kwargs
         self.bags = bags
