@@ -1,41 +1,57 @@
 import numpy as np
-import DTLearner as dt
-import RTLearner as rt
+import pandas as pd
 import LinRegLearner as lrl
-
+import DTLearner as dt
 class BagLearner(object):
-    def __init__(self, learner, kwargs, bags, boost, verbose):
+
+    def __init__(self, learner, kwargs , bags = 20 , boost = False, verbose = False ):
         self.learner = learner
         self.bags = bags
-        self.kwargs = kwargs
-        self.learners = []
+        temp_learner = []
         for i in range(self.bags):
-            self.learners.append(learner(**kwargs))
-        pass
+            temp_learner.append(learner(**kwargs))
+        self.learner = temp_learner
+        self.kwargs = kwargs
+        self.boost = boost
+        self.verbose = verbose
+        self.Xbags = None
+        self.Ybags = None
+        if verbose:
+            print 'Printing Debugging info....'
 
     def author(self):
-        return 'zwin3'
+            return 'zwin3'
 
-    def addEvidence(self, x, y):
-        data = np.column_stack((x, y))
-        self.bagging(data)
+    def addEvidence(self,Xtrain, Ytrain):
+        self.Xtrain = Xtrain
+        self.Ytrain = Ytrain
+        numberOfSamples = self.Xtrain.shape[0]
+        index = []
+        self.Xbags = []
+        self.Ybags = []
 
-    def bagging(self, data):
-        row_size = data.shape[0]
-        n = int(1.0* data.shape[0])
-        data_bag = np.empty(shape = (0, data.shape[1]))
-        for i in range(self.bags):
-            idx = np.random.randint(row_size, size=row_size)
-            data_bag = data[idx, :]
-            data_bagX = np.delete(data_bag, -1, axis = 1)
-            data_bagY = data_bag[:, -1]
-            self.learners[i].addEvidence(data_bagX, data_bagY)
+        for learner in self.learner:
+            idx = np.random.choice(numberOfSamples, numberOfSamples)
+            self.Xbags = Xtrain[idx]
+            self.Ybags = Ytrain[idx]
+            learner.addEvidence(self.Xbags, self.Ybags)
 
 
-    def query(self, points):
-        units = list()
-        for i in range(self.bags):
-            learned = self.learners[i].query(points)
-            units.append(learned)
-        z = np.mean(units, axis = 0)
-        return z
+    def query(self,Xtest):
+        learner  = []
+        self.Xtest = Xtest
+        Arra = np.array([learner.query(Xtest) for learner in self.learner])
+        return np.mean(Arra, axis=0)
+
+        """result = np.zeros((len(self.Xbags), len(Xtest)))
+        for i in range(0, self.bags):
+            learner.append(self.learner(self.kwargs))
+
+        for i in range(0,len(learners)):
+            learner[i].addEvidence(self.Xbags[i],self.Ybags[i])
+
+            result[i] = learner[i].query(self.Xtest)
+        return np.mean(result, axis = 0)"""
+
+if __name__=="__main__":
+    print ("secret clue is a BagLearner\n")
