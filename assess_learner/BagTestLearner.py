@@ -43,7 +43,7 @@ if __name__ == '__main__':
     print 'time = {} s'.format(stop - start)
 
     # Plot RMSE for training dataset vs. leaf_size
-    maxLeafSize = 50
+    maxLeafSize = 30
     errTrain = np.zeros(maxLeafSize);
     errTest = np.zeros(maxLeafSize);
     for size in range(1, maxLeafSize+1):

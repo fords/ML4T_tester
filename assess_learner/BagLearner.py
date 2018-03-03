@@ -1,59 +1,41 @@
 import numpy as np
-
+import DTLearner as dt
+import RTLearner as rt
+import LinRegLearner as lrl
 
 class BagLearner(object):
-
-
-    def __init__(self, learner, kwargs, bags = 1, boost = False, verbose = False):
-
-        self.verbose = verbose
-        if self.verbose == True:
-            for name, value in kwargs.items(): # print name-value pairs contained in kwargs dictionary
-                print '{0} = {1}'.format(name, value)
-
-        learnerList = [] # initialize list of learner objects
-        for bag in range(bags):
-            # unpack kwargs dictionary to create a learner object
-            learnerList.append(learner(verbose = self.verbose, **kwargs))
-
-        self.learnerList = learnerList
+    def __init__(self, learner, kwargs, bags, boost, verbose):
+        self.learner = learner
         self.bags = bags
-        self.boost = boost
+        self.kwargs = kwargs
+        self.learners = []
+        for i in range(self.bags):
+            self.learners.append(learner(**kwargs))
+        pass
+
+    def author(self):
+        return 'zwin3'
+
+    def addEvidence(self, x, y):
+        data = np.column_stack((x, y))
+        self.bagging(data)
+
+    def bagging(self, data):
+        row_size = data.shape[0]
+        n = int(1.0* data.shape[0])
+        data_bag = np.empty(shape = (0, data.shape[1]))
+        for i in range(self.bags):
+            idx = np.random.randint(row_size, size=row_size)
+            data_bag = data[idx, :]
+            data_bagX = np.delete(data_bag, -1, axis = 1)
+            data_bagY = data_bag[:, -1]
+            self.learners[i].addEvidence(data_bagX, data_bagY)
 
 
-    def addEvidence(self, trainX, trainY):
-        """
-        @summary: Add training data and train individual learners in BagLearner
-        @param trainX: ndarray, X training data with examples in rows & features in columns
-        @param trainY: 1Darray, Y training data
-
-        Returns: nothing but possibly trains the individual learners depending
-                 on what add_Evidence does to each one
-        """
-
-
-        bagSize = len(trainY) # bag size determined by number of training examples
-        for learner in self.learnerList:
-            # randomly select indexes of training examples. Number of indexes
-            # selected determined by bagSize
-            ix = np.random.choice( range( bagSize ), bagSize, replace = True )
-            bagX = trainX[ix]; bagY = trainY[ix] # training examples/labels for each BagLearner
-            learner.addEvidence(bagX, bagY) # add training examples/labels to each BagLearner
-
-
-    def query(self, testX):
-        """
-        @summary: Add test data to query individual learners in BagLearner
-        @param testX: ndarray, X test data with examples in rows & features in columns
-
-        Returns pred: 1Darray, the predicted labels
-        """
-
-
-        pred = np.empty((testX.shape[0],self.bags)) # initialize pred, no. of
-        # rows = no. of test examples, no of columns = no. of individual learners
-        for col in range(pred.shape[1]):
-            # predictions for each learner in rows of pred
-            pred[:,col] = self.learnerList[col].query(testX)
-
-        return np.mean(pred, axis = 1) # return (column) mean of all learners in 1D-array
+    def query(self, points):
+        units = list()
+        for i in range(self.bags):
+            learned = self.learners[i].query(points)
+            units.append(learned)
+        z = np.mean(units, axis = 0)
+        return z
