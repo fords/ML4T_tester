@@ -8,7 +8,7 @@ import RTLearner as rtl
 if __name__ == '__main__':
     data = np.genfromtxt('Data/Istanbul.csv', delimiter = ',');
     data = data[1:,1:];# eliminate 1st row and 1st column containing col-labels and dates
-    np.random.shuffle(data)# shuffle in-place
+    #np.random.shuffle(data)# shuffle in-place
     split = int(0.6*data.shape[0])#60-40 break into train-test sets
     trainX = data[:split,:-1]
     trainY = data[:split,-1]#last column is labels
@@ -17,9 +17,9 @@ if __name__ == '__main__':
 
     # create a learner and train it
     start = time.time()
-    DT_learner =rtl.RTLearner(leaf_size = 1, verbose = True) # create an DTLearner
+    #DT_learner =rtl.RTLearner(leaf_size = 1, verbose = True) # create an DTLearner
     #DT_learner.addEvidence(trainX, trainY)# train it
-    learner = bl.BagLearner(learner = DT_learner, kwargs = {},bags = 20, boost = False, verbose = False)
+    learner = bl.BagLearner(learner = dt.DTLearner, kwargs =  {"leaf_size":1} ,bags = 20, boost = False, verbose = False)
 
     learner.addEvidence(trainX, trainY)# train it
 #
@@ -43,13 +43,13 @@ if __name__ == '__main__':
     print 'time = {} s'.format(stop - start)
 
     # Plot RMSE for training dataset vs. leaf_size
-    maxLeafSize = 100
+    maxLeafSize = 50
     errTrain = np.zeros(maxLeafSize);
     errTest = np.zeros(maxLeafSize);
     for size in range(1, maxLeafSize+1):
-        #learner = bl.learner(learner =DT_learner, bags = 20, boost = False, verbose = False)# create learner
-        for i in range(100):
-            np.random.shuffle(data) # shuffle in-place
+        learner = bl.BagLearner(learner =dt.DTLearner,  kwargs =  {"leaf_size":1}, bags = 20, boost = False, verbose = False)# create learner
+        for i in range(10):
+            #np.random.shuffle(data) # shuffle in-place
             learner.addEvidence(trainX, trainY) # train on shuffled trainX, trainY
             # training sample testing
             Y = learner.query(trainX)# get the predictions
