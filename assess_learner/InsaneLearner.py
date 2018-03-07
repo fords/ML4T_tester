@@ -11,7 +11,7 @@ class InsaneLearner(object):
             print ' Debugging .....  '
         pass
 
-    def author(self):
+    def author():
         return 'zwin3'
 
     def addEvidence(self, x, y):

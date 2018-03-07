@@ -9,7 +9,7 @@ class LinRegLearner(object):
     def __init__(self, verbose = False):
         pass # move along, these aren't the drones you're looking for
 
-    def author(self):
+    def author():
         return 'zwin3' # replace tb34 with your Georgia Tech username
 
     def addEvidence(self,dataX,dataY):
