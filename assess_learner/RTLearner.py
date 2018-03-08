@@ -17,7 +17,7 @@ class RTLearner(object):
         else:
             pass
 
-    def author():
+    def author(self):
         return "zwin3"
 
     def get_indx(self, x_train, numberOfSamples):
@@ -72,3 +72,6 @@ class RTLearner(object):
                 temp_leaf = self.tree[init_index , 0]
             result[indx, 0] = self.tree[init_index , 1]
         return result.flatten()
+
+if __name__=="__main__":
+    print "the secret clue is RTLearner\n"

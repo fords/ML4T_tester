@@ -19,7 +19,7 @@ class BagLearner(object):
         if verbose:
             print 'Printing Debugging info....'
 
-    def author():
+    def author(self):
             return 'zwin3'
 
     def addEvidence(self,Xtrain, Ytrain):

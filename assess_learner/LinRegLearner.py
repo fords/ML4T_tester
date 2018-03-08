@@ -1,5 +1,5 @@
 """
-A simple wrapper for linear regression.  (c) 2015 Tucker Balch
+A simple wrapper for linear regression.  
 """
 
 import numpy as np
@@ -9,7 +9,7 @@ class LinRegLearner(object):
     def __init__(self, verbose = False):
         pass # move along, these aren't the drones you're looking for
 
-    def author():
+    def author(self):
         return 'zwin3' # replace tb34 with your Georgia Tech username
 
     def addEvidence(self,dataX,dataY):

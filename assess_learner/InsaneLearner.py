@@ -11,11 +11,11 @@ class InsaneLearner(object):
             print ' Debugging .....  '
         pass
 
-    def author():
+    def author(self):
         return 'zwin3'
 
     def addEvidence(self, x, y):
-        for i in range(0,20):  # bags are fixed 20 
+        for i in range(0,20):  # bags are fixed 20
             learner = bl.BagLearner( learner = lrl.LinRegLearner, kwargs = {}, bags = 20, boost = False, verbose = False)
             learner.addEvidence(x, y)
             self.learner.append(learner)

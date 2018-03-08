@@ -18,7 +18,7 @@ class DTLearner(object):
         else:
             pass
 
-    def author():
+    def author(self):
         return "zwin3"
 
     def get_indx(self, x_train, numberOfSamples):
