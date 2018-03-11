@@ -151,8 +151,12 @@ def test_code():
     # Here we just fake the data. you should use your code from previous assignments.
     start_date = dt.datetime(2011,01,14)
     end_date = dt.datetime(2011,12,14)
-    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio ,ev   = assess_portfolio(portvals)
-    cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = [0.2,0.01,0.02,1.5]
+    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio ,ev   = assess_portfolio(portvals, sf =245)
+    prices_SPX = get_data(['$SPX'], pd.date_range(start_date, end_date))
+    prices_SPX = prices_SPX[['$SPX']]
+    portvals_SPX = (prices_SPX/prices_SPX.ix[0,:]).sum(axis=1)
+    cum_ret_SPX, avg_daily_ret_SPX, std_daily_ret_SPX, sharpe_ratio_SPX = assess_portfolio(portvals_SPX)
+    #cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = [0.2,0.01,0.02,1.5]
 
     daily_returns = portvals[1:].values / portvals[:-1] - 1
     sf = 245
