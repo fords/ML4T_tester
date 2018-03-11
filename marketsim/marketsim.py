@@ -149,8 +149,8 @@ def test_code():
 
     # Get portfolio stats
     # Here we just fake the data. you should use your code from previous assignments.
-    start_date = dt.datetime(2011,14,01)
-    end_date = dt.datetime(2011,14,12)
+    start_date = dt.datetime(2011,01,14)
+    end_date = dt.datetime(2011,12,14)
     cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio ,ev   = assess_portfolio(portvals)
     cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = [0.2,0.01,0.02,1.5]
 
