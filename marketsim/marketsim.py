@@ -46,7 +46,7 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
 
     df_portval = cal_portval(df_values)
 
-    return rv
+    #return rv
     return df_portval
 def create_trades(df_orders, df_prices, commission, impact):
     df_trades = pd.DataFrame(0.0, columns=df_prices.columns, index=df_prices.index)
