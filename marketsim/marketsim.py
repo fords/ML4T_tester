@@ -11,6 +11,9 @@ import datetime as dt
 import os
 from util import get_data, plot_data
 
+def author():
+    return 'zwin3'
+
 def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, commission=9.95, impact=0.005):
     # this is the function the autograder will call to test your code
     # NOTE: orders_file may be a string, or it may be a file object. Your
@@ -88,31 +91,68 @@ def create_values(df_prices, df_holdings):
 def cal_portval(df_values):
     return df_values.sum(axis = 1)
 
-def compute_portfolio_stats(port_val, \
-    rfr = 0.0, sf = 252.0):
-    cr = get_cm_return(port_val)
-    daily_returns = get_daily_returns(port_val)
-    adr = daily_returns.mean()
-    sddr = daily_returns.std()
+def assess_portfolio(sd = dt.datetime(2008,1,1), ed = dt.datetime(2009,1,1), \
+    syms = ['GOOG','AAPL','GLD','XOM'], \
+    allocs=[0.1,0.2,0.3,0.4], \
+    sv=1000000, rfr=0.0, sf=252.0, \
+    gen_plot=False):
 
-    #calculating sr
-    diff_returns = daily_returns - rfr
-    diff_returns_mean = diff_returns.mean()
+    # Read in adjusted closing prices for given symbols, date range
+    dates = pd.date_range(sd, ed)
+    prices_all = get_data(syms, dates)  # automatically adds SPY
+    prices = prices_all[syms]  # only portfolio symbols
+    prices_SPY = prices_all['SPY']  # only SPY, for comparison later
 
-    sr = np.sqrt(sf) * (diff_returns_mean / sddr)
-    return cr, adr, sddr, sr
+    df = get_data(syms,dates)
+    #print "df",df.ix[:,1]   # 0 index first data 'GOOG'
+    #plot_data(df)
+    # Compute daily returns
+    daily_returns = compute_daily_returns(df)
+    normed = prices.copy()
+    normed[0:] = (prices[0:]/ prices.ix[0,:])
+    alloced = normed * allocs
+    pos_vals = alloced * sv
+    port_val = pos_vals.sum(axis = 1)
+    #print port_val.ix[1,0]
+    #print port_val
+    #port_val = prices_SPY # add code here to compute daily portfolio values
 
-def get_daily_returns(port_val):
-    daily_returns = port_val.copy()
-    daily_returns[1:] = (port_val[1:] / port_val[:-1].values) - 1
+    # Get portfolio statistics (note: std_daily_ret = volatility)
+    #cr = compute_cumu_returns(port_val)
+    cr = (port_val.ix[-1,:]/port_val.ix[0,:])  -1
+    daily_rets = []
+    daily_rets = compute_daily_returns(port_val)
+    daily_rets = daily_rets[1:]         # daily returns
+    adr = daily_rets.mean()
+    sddr = daily_rets.std()   # standard deviation daily return
+    difference = daily_rets - rfr
+    mean_val = difference.mean()
+    sr =  np.sqrt(sf)* mean_val/sddr                  #sharpe ratio
+
+    # Compare daily portfolio value with SPY using a normalized plot
+    if gen_plot:
+        # add code to plot here
+        df_temp = pd.concat([port_val, prices_SPY], keys=['Portfolio', 'SPY'], axis=1)
+        plot_data( df_temp, title= "Plot" , ylabel= "Prices")
+        pass
+
+    ev = port_val.ix[-1,:]
+    #print ("ev",ev)
+    return cr, adr, sddr, sr, ev, port_val
+
+
+def compute_daily_returns(df):
+    daily_returns = df.copy()
+    daily_returns[1:] = (df[1:]/ df[:-1].values) -1
     daily_returns = daily_returns[1:]
     return daily_returns
 
-def get_cm_return(port_val):
-    return (port_val.ix[-1, :] / port_val.ix[0, :]) - 1
+def compute_cumu_returns(df):
+    """ Compute and return the daily cumulative return values"""
+    cumulative_df = df.copy()
+    cumulative_df[0:] = (df[0:]/ df.ix[0,:]) -1
+    return cumulative_df
 
-def author():
-    return 'zwin3'
 
 def test_code():
     # this is a helper function you can use to test your code
