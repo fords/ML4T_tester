@@ -155,7 +155,7 @@ def test_code():
     prices_SPX = get_data(['$SPX'], pd.date_range(start_date, end_date))
     prices_SPX = prices_SPX[['$SPX']]
     portvals_SPX = (prices_SPX/prices_SPX.ix[0,:]).sum(axis=1)
-    cum_ret_SPX, avg_daily_ret_SPX, std_daily_ret_SPX, sharpe_ratio_SPX = assess_portfolio(portvals_SPX)
+    cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = assess_portfolio(portvals_SPX)
     #cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = [0.2,0.01,0.02,1.5]
 
     daily_returns = portvals[1:].values / portvals[:-1] - 1
