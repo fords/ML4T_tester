@@ -91,37 +91,15 @@ def create_values(df_prices, df_holdings):
 def cal_portval(df_values):
     return df_values.sum(axis = 1)
 
-def assess_portfolio(sd = dt.datetime(2008,1,1), ed = dt.datetime(2009,1,1), \
-    syms = ['GOOG','AAPL','GLD','XOM'], \
-    allocs=[0.1,0.2,0.3,0.4], \
-    sv=1000000, rfr=0.0, sf=252.0, \
+def assess_portfolio(portvals, rfr=0.0, sf=252.0, \
     gen_plot=False):
 
-    # Read in adjusted closing prices for given symbols, date range
-    dates = pd.date_range(sd, ed)
-    prices_all = get_data(syms, dates)  # automatically adds SPY
-    prices = prices_all[syms]  # only portfolio symbols
-    prices_SPY = prices_all['SPY']  # only SPY, for comparison later
-
-    df = get_data(syms,dates)
-    #print "df",df.ix[:,1]   # 0 index first data 'GOOG'
-    #plot_data(df)
-    # Compute daily returns
-    daily_returns = compute_daily_returns(df)
-    normed = prices.copy()
-    normed[0:] = (prices[0:]/ prices.ix[0,:])
-    alloced = normed * allocs
-    pos_vals = alloced * sv
-    port_val = pos_vals.sum(axis = 1)
-    #print port_val.ix[1,0]
-    #print port_val
-    #port_val = prices_SPY # add code here to compute daily portfolio values
 
     # Get portfolio statistics (note: std_daily_ret = volatility)
     #cr = compute_cumu_returns(port_val)
-    cr = (port_val.ix[-1,:]/port_val.ix[0,:])  -1
+    cr = (portvals.ix[-1,:]/portvals.ix[0,:])  -1
     daily_rets = []
-    daily_rets = compute_daily_returns(port_val)
+    daily_rets = compute_daily_returns(portvals)
     daily_rets = daily_rets[1:]         # daily returns
     adr = daily_rets.mean()
     sddr = daily_rets.std()   # standard deviation daily return
@@ -136,9 +114,9 @@ def assess_portfolio(sd = dt.datetime(2008,1,1), ed = dt.datetime(2009,1,1), \
         plot_data( df_temp, title= "Plot" , ylabel= "Prices")
         pass
 
-    ev = port_val.ix[-1,:]
+    ev = portvals.ix[-1,:]
     #print ("ev",ev)
-    return cr, adr, sddr, sr, ev, port_val
+    return cr, adr, sddr, sr, ev
 
 
 def compute_daily_returns(df):
@@ -173,7 +151,7 @@ def test_code():
     # Here we just fake the data. you should use your code from previous assignments.
     start_date = dt.datetime(2008,1,1)
     end_date = dt.datetime(2008,6,1)
-    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio = [0.2,0.01,0.02,1.5]
+    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio ,ev   = assess_portfolio(portvals)
     cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = [0.2,0.01,0.02,1.5]
 
     # Compare portfolio against $SPX
