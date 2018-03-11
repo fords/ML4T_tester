@@ -116,7 +116,7 @@ def assess_portfolio(portvals, rfr=0.0, sf=245.0, \
 
     ev = portvals.ix[-1,:]
     #print ("ev",ev)
-    return cr, adr, sddr, sr, ev
+    return cr, adr, sddr, sr
 
 
 def compute_daily_returns(df):
@@ -151,7 +151,7 @@ def test_code():
     # Here we just fake the data. you should use your code from previous assignments.
     start_date = dt.datetime(2011,01,14)
     end_date = dt.datetime(2011,12,14)
-    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio ,ev   = assess_portfolio(portvals, sf =245)
+    cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio   = assess_portfolio(portvals, sf =245)
     prices_SPX = get_data(['$SPX'], pd.date_range(start_date, end_date))
     prices_SPX = prices_SPX[['$SPX']]
     portvals_SPX = (prices_SPX/prices_SPX.ix[0,:]).sum(axis=1)
