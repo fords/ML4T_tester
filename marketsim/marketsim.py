@@ -111,6 +111,9 @@ def get_daily_returns(port_val):
 def get_cm_return(port_val):
     return (port_val.ix[-1, :] / port_val.ix[0, :]) - 1
 
+def author():
+    return 'zwin3'
+
 def test_code():
     # this is a helper function you can use to test your code
     # note that during autograding his function will not be called.
