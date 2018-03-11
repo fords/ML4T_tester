@@ -91,7 +91,7 @@ def create_values(df_prices, df_holdings):
 def cal_portval(df_values):
     return df_values.sum(axis = 1)
 
-def assess_portfolio(portvals, rfr=0.0, sf=252.0, \
+def assess_portfolio(portvals, rfr=0.0, sf=245.0, \
     gen_plot=False):
 
 
@@ -153,6 +153,13 @@ def test_code():
     end_date = dt.datetime(2011,12,14)
     cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio ,ev   = assess_portfolio(portvals)
     cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = [0.2,0.01,0.02,1.5]
+
+    daily_returns = portvals[1:].values / portvals[:-1] - 1
+    sf = 245
+    cum_ret = portvals[-1] / portvals[0] - 1
+    avg_daily_ret = daily_returns.mean()
+    std_daily_ret = daily_returns.std()
+    sharpe_ratio = np.sqrt(sf) * avg_daily_ret / std_daily_ret
 
     # Compare portfolio against $SPX
     print "Date Range: {} to {}".format(start_date, end_date)
