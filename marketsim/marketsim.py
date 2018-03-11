@@ -158,11 +158,17 @@ def test_code():
     cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = assess_portfolio(portvals_SPX,sf =252)
     #cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = [0.2,0.01,0.02,1.5]
 
-    #daily_returns = portvals[1:].values / portvals[:-1] - 1
-    #cum_ret = portvals[-1] / portvals[0] - 1
-    #avg_daily_ret = daily_returns.mean()
-    #std_daily_ret = daily_returns.std()
-    #sharpe_ratio = np.sqrt(245) * avg_daily_ret / std_daily_ret  #sf = 245
+    daily_returns = portvals[1:].values / portvals[:-1] - 1
+    cum_ret = portvals[-1] / portvals[0] - 1
+    avg_daily_ret = daily_returns.mean()
+    std_daily_ret = daily_returns.std()
+    sharpe_ratio = np.sqrt(245) * avg_daily_ret / std_daily_ret  #sf = 245
+
+    daily_returns_SPY = portvals_SPX[1:].values / portvals_SPX[:-1] - 1
+    cum_ret_SPY = portvals_SPX[-1] / portvals_SPX[0] - 1
+    avg_daily_ret_SPY = daily_returns_SPY.mean()
+    std_daily_ret_SPY = daily_returns_SPY.std()
+    sharpe_ratio_SPY = np.sqrt(245) * avg_daily_ret_SPY / std_daily_ret_SPY  #sf = 245
 
     # Compare portfolio against $SPX
     print "Date Range: {} to {}".format(start_date, end_date)
