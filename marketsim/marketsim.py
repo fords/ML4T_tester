@@ -18,18 +18,17 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
     # this is the function the autograder will call to test your code
     # NOTE: orders_file may be a string, or it may be a file object. Your
     # code should work correctly with either input
-
+    # TODO: Your code here
 
     # In the template, instead of computing the value of the portfolio, we just
     # read in the value of IBM over 6 months
-
     start_date = dt.datetime(2008,1,1)
     end_date = dt.datetime(2008,6,1)
     portvals = get_data(['IBM'], pd.date_range(start_date, end_date))
     portvals = portvals[['IBM']]  # remove SPY
-    rv = pd.read_csv(orders_file,delimiter=',', encoding="utf-8-sig")
+    rv = pd.DataFrame(index=portvals.index, data=portvals.as_matrix())
 
-        df_orders = pd.read_csv(orders_file, index_col='Date', parse_dates=True, na_values=['nan'])
+    df_orders = pd.read_csv(orders_file, index_col='Date', parse_dates=True, na_values=['nan'])
     df_orders.sort_index(inplace=True)
 
     dates = pd.date_range(df_orders.first_valid_index(), df_orders.last_valid_index())
@@ -76,6 +75,7 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
 def assess_portfolio(portvals, rfr=0.0, sf=245.0, \
     gen_plot=False):
 
+
     # Get portfolio statistics (note: std_daily_ret = volatility)
     #cr = compute_cumu_returns(port_val)
     cr = (portvals.ix[-1,:]/portvals.ix[0,:])  -1
@@ -113,12 +113,12 @@ def compute_cumu_returns(df):
     return cumulative_df
 
 
-def test_code(start_date= dt.datetime(2011,01,14), end_date = dt.datetime(2011,12,14), of= "./orders/orders2.csv" ):
+def test_code():
     # this is a helper function you can use to test your code
     # note that during autograding his function will not be called.
     # Define input parameters
 
-    #of = "./orders/orders2.csv"
+    of = "./orders/orders2.csv"
     sv = 1000000
 
     # Process orders
@@ -130,8 +130,8 @@ def test_code(start_date= dt.datetime(2011,01,14), end_date = dt.datetime(2011,1
 
     # Get portfolio stats
     # Here we just fake the data. you should use your code from previous assignments.
-    #start_date = dt.datetime(2011,01,14)
-    #end_date = dt.datetime(2011,12,14)
+    start_date = dt.datetime(2011,01,14)
+    end_date = dt.datetime(2011,12,14)
     cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio   = assess_portfolio(portvals, sf =245)
     prices_SPX = get_data(['$SPX'] , pd.date_range(start_date, end_date))
     prices_SPX = prices_SPX[['$SPX']]
@@ -169,8 +169,4 @@ def test_code(start_date= dt.datetime(2011,01,14), end_date = dt.datetime(2011,1
     print "Final Portfolio Value: {}".format(portvals[-1])
 
 if __name__ == "__main__":
-    start_date= dt.datetime(2011,01,14)
-    end_date = dt.datetime(2011,12,14)
-    of= "./orders/orders2.csv"
-    test_code(start_date,end_date, of)
-    #test_code(dt.datetime(2011,01,10), dt.datetime(2011,12,20), "./orders/orders.csv")
+    test_code()
