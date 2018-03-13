@@ -29,52 +29,49 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
     portvals = portvals[['IBM']]  # remove SPY
     rv = pd.read_csv(orders_file,delimiter=',', encoding="utf-8-sig")
 
-    orders_df = pd.read_csv(orders_file, index_col='Date', \
-                parse_dates=True, na_values=['nan'],\
-                #names=['Date', 'SYMBOL', 'ORDER', 'SHARES'],\
-                #skiprows=[0]\
-                )
-    orders_df.sort_index(inplace=True)
+        df_orders = pd.read_csv(orders_file, index_col='Date', parse_dates=True, na_values=['nan'])
+    df_orders.sort_index(inplace=True)
 
-    dates = pd.date_range(min(orders_df.index), max(orders_df.index))
-    symbols = []  # array
-    symbols = list(set(orders_df['Symbol']))
+    dates = pd.date_range(df_orders.first_valid_index(), df_orders.last_valid_index())
 
-    prices = get_data(symbols, dates)
+    syms = np.array(df_orders.Symbol.unique()).tolist()
+    prices = get_data(syms, dates)
+    columns = ['Cash']
+    df_cash = pd.DataFrame(index=dates, columns=columns)
+    df_cash = df_cash.fillna(1.0)
+    prices = prices.join(df_cash)
 
-    cash_columns = ['Cash']
-    commission_col = ['Commission']
-    impact_col = ['Impact']
-    cash_df = pd.DataFrame( index = dates, columns = cash_columns)
-    cash_df = cash_df.fillna(1.000)
-    prices = prices.join(cash_df)
-    trades = pd.DataFrame(.0, columns = prices.columns, index = prices.index)
-    comission_val = pd.DataFrame(index = prices.index, columns = commission_col)
-    comission_val = comission_val.fillna(.00)
-    impact_val = pd.DataFrame(index = prices.index, columns = impact_col)
-    impact_val = impact_val.fillna(.00)
+    df_trades = pd.DataFrame(0.0, columns = prices.columns, index =prices.index)
+    columns_com = ['Commission']
+    df_commission = pd.DataFrame(index=prices.index, columns=columns_com)
+    df_commission = df_commission.fillna(0.0)
+    Col_impact = ['Impact']
+    df_impact = pd.DataFrame(index=prices.index, columns=Col_impact)
+    df_impact = df_impact.fillna(0.0)
+    for i, row in df_orders.iterrows():
+        sym = row['Symbol']
+        shares = row['Shares']
+        a = -1
+        if (row['Order'] == 'BUY'):
+            a = 1
+        df_trades.loc[i][sym] = df_trades.loc[i][sym] + (a * shares)
+        df_commission.loc[i]['Commission'] = df_commission.loc[i]['Commission'] + commission
+        df_impact.loc[i]['Impact'] = df_impact.loc[i]['Impact'] + (prices.loc[i][sym] * shares * impact)
+    df_temp = (prices * df_trades)
+    df_trades['Cash'] = (-1.0 * df_temp.sum(axis = 1))
 
-    for i, iterrows in orders_df.iterrows():
-        shares = iterrows['Shares']
-        symbols = iterrows['Symbol']
-        if (iterrows['Order'] == 'SELL'):
-            trades.loc[i][symbols] = trades.loc[i][symbols] + (-1 * shares)
-        elif (iterrows['Order'] == 'BUY'):
-            trades.loc[i][symbols] = trades.loc[i][symbols] + (1 * shares)
-        comission_val.loc[i]['Commission'] = comission_val.loc[i]['Commission'] + commission
-        impact_val.loc[i]['Impact'] = impact_val.loc[i]['Impact'] + (prices.loc[i][symbols] * shares * impact)
+    df_trades['Cash'] = df_trades['Cash'] - df_commission['Commission'] - df_impact['Impact']
+    start_date = df_trades.first_valid_index()
+    df_holdings = pd.DataFrame(0.0, columns = df_trades.columns, index = df_trades.index)
+    df_holdings.loc[start_date, 'Cash'] = start_val
+    df_holdings = df_holdings + df_trades
+    df_holdings = df_holdings.cumsum()
 
-
-    temp_df = prices * trades
-    trades['Cash'] = -1.0 * temp_df.sum(axis = 1)
-    trades['Cash'] = trades['Cash'] - comission_val['Commission'] - impact_val['Impact']
-    holdings = pd.DataFrame( .0, columns = trades.columns, index = trades.index)
-    holdings.loc[min(trades.index), 'Cash'] = start_val   # start_date = min(trades.index)
-    holdings = holdings + trades
-    portvals = (prices * holdings.cumsum()).sum(axis = 1)
+    df_result = prices * df_holdings
+    df_portval = df_result.sum(axis = 1)
 
     #return rv
-    return portvals
+    return df_portval
 
 def assess_portfolio(portvals, rfr=0.0, sf=245.0, \
     gen_plot=False):
