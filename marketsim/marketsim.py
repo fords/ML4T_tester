@@ -18,82 +18,66 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
     # this is the function the autograder will call to test your code
     # NOTE: orders_file may be a string, or it may be a file object. Your
     # code should work correctly with either input
-    # TODO: Your code here
+
 
     # In the template, instead of computing the value of the portfolio, we just
     # read in the value of IBM over 6 months
+
     start_date = dt.datetime(2008,1,1)
     end_date = dt.datetime(2008,6,1)
     portvals = get_data(['IBM'], pd.date_range(start_date, end_date))
     portvals = portvals[['IBM']]  # remove SPY
-    rv = pd.DataFrame(index=portvals.index, data=portvals.as_matrix())
+    rv = pd.read_csv(orders_file,delimiter=',', encoding="utf-8-sig")
 
-    df_orders = pd.read_csv(orders_file, index_col='Date', parse_dates=True, na_values=['nan'])
-    df_orders.sort_index(inplace=True)
+    orders_df = pd.read_csv(orders_file, index_col='Date', \
+                parse_dates=True, na_values=['nan'],\
+                #names=['Date', 'SYMBOL', 'ORDER', 'SHARES'],\
+                #skiprows=[0]\
+                )
+    orders_df.sort_index(inplace=True)
 
-    dates = pd.date_range(df_orders.first_valid_index(), df_orders.last_valid_index())
+    dates = pd.date_range(min(orders_df.index), max(orders_df.index))
+    symbols = []  # array
+    symbols = list(set(orders_df['Symbol']))
 
-    syms = np.array(df_orders.Symbol.unique()).tolist()
-    df_prices = get_data(syms, dates)
-    columns = ['Cash']
-    df_cash = pd.DataFrame(index=dates, columns=columns)
-    df_cash = df_cash.fillna(1.0)
-    df_prices = df_prices.join(df_cash)
+    prices = get_data(symbols, dates)
+
+    cash_columns = ['Cash']
+    commission_col = ['Commission']
+    impact_col = ['Impact']
+    cash_df = pd.DataFrame( index = dates, columns = cash_columns)
+    cash_df = cash_df.fillna(1.000)
+    prices = prices.join(cash_df)
+    trades = pd.DataFrame(.0, columns = prices.columns, index = prices.index)
+    comission_val = pd.DataFrame(index = prices.index, columns = commission_col)
+    comission_val = comission_val.fillna(.00)
+    impact_val = pd.DataFrame(index = prices.index, columns = impact_col)
+    impact_val = impact_val.fillna(.00)
+
+    for i, iterrows in orders_df.iterrows():
+        shares = iterrows['Shares']
+        symbols = iterrows['Symbol']
+        if (iterrows['Order'] == 'SELL'):
+            trades.loc[i][symbols] = trades.loc[i][symbols] + (-1 * shares)
+        elif (iterrows['Order'] == 'BUY'):
+            trades.loc[i][symbols] = trades.loc[i][symbols] + (1 * shares)
+        comission_val.loc[i]['Commission'] = comission_val.loc[i]['Commission'] + commission
+        impact_val.loc[i]['Impact'] = impact_val.loc[i]['Impact'] + (prices.loc[i][symbols] * shares * impact)
 
 
-    df_trades = create_trades(df_orders, df_prices, commission, impact)
-
-    df_holdings = create_holdings(df_trades, start_val)
-
-    df_values = create_values(df_prices, df_holdings)
-
-    df_portval = cal_portval(df_values)
+    temp_df = prices * trades
+    trades['Cash'] = -1.0 * temp_df.sum(axis = 1)
+    trades['Cash'] = trades['Cash'] - comission_val['Commission'] - impact_val['Impact']
+    holdings = pd.DataFrame( .0, columns = trades.columns, index = trades.index)
+    holdings.loc[min(trades.index), 'Cash'] = start_val   # start_date = min(trades.index)
+    holdings = holdings + trades
+    portvals = (prices * holdings.cumsum()).sum(axis = 1)
 
     #return rv
-    return df_portval
-def create_trades(df_orders, df_prices, commission, impact):
-    df_trades = pd.DataFrame(0.0, columns=df_prices.columns, index=df_prices.index)
-    columns = ['Commission']
-    df_commission = pd.DataFrame(index=df_prices.index, columns=columns)
-    df_commission = df_commission.fillna(0.0)
-    columns_2 = ['Impact']
-    df_impact = pd.DataFrame(index=df_prices.index, columns=columns_2)
-    df_impact = df_impact.fillna(0.0)
-    for index, row in df_orders.iterrows():
-        sym = row['Symbol']
-        shares = row['Shares']
-        a = -1
-        if (row['Order'] == 'BUY'):
-            a = 1
-        df_trades.loc[index][sym] = df_trades.loc[index][sym] + (a * shares)
-        df_commission.loc[index]['Commission'] = df_commission.loc[index]['Commission'] + commission
-        df_impact.loc[index]['Impact'] = df_impact.loc[index]['Impact'] + (df_prices.loc[index][sym] * shares * impact)
-
-    df_temp = (df_prices * df_trades)
-
-    df_trades['Cash'] = (-1.0 * df_temp.sum(axis = 1))
-
-    df_trades['Cash'] = df_trades['Cash'] - df_commission['Commission'] - df_impact['Impact']
-
-    return df_trades
-
-def create_holdings(df_trades, start_val):
-    start_date = df_trades.first_valid_index()
-    df_holdings = pd.DataFrame(0.0, columns=df_trades.columns, index=df_trades.index)
-    df_holdings.loc[start_date, 'Cash'] = start_val
-    df_holdings = df_holdings + df_trades
-    df_holdings = df_holdings.cumsum()
-    return df_holdings
-
-def create_values(df_prices, df_holdings):
-    return df_prices * df_holdings
-
-def cal_portval(df_values):
-    return df_values.sum(axis = 1)
+    return portvals
 
 def assess_portfolio(portvals, rfr=0.0, sf=245.0, \
     gen_plot=False):
-
 
     # Get portfolio statistics (note: std_daily_ret = volatility)
     #cr = compute_cumu_returns(port_val)
@@ -132,12 +116,12 @@ def compute_cumu_returns(df):
     return cumulative_df
 
 
-def test_code():
+def test_code(start_date= dt.datetime(2011,01,14), end_date = dt.datetime(2011,12,14), of= "./orders/orders2.csv" ):
     # this is a helper function you can use to test your code
     # note that during autograding his function will not be called.
     # Define input parameters
 
-    of = "./orders/orders2.csv"
+    #of = "./orders/orders2.csv"
     sv = 1000000
 
     # Process orders
@@ -149,10 +133,10 @@ def test_code():
 
     # Get portfolio stats
     # Here we just fake the data. you should use your code from previous assignments.
-    start_date = dt.datetime(2011,01,14)
-    end_date = dt.datetime(2011,12,14)
+    #start_date = dt.datetime(2011,01,14)
+    #end_date = dt.datetime(2011,12,14)
     cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio   = assess_portfolio(portvals, sf =245)
-    prices_SPX = get_data(['$SPX'], pd.date_range(start_date, end_date))
+    prices_SPX = get_data(['$SPX'] , pd.date_range(start_date, end_date))
     prices_SPX = prices_SPX[['$SPX']]
     portvals_SPX = (prices_SPX/prices_SPX.ix[0,:]).sum(axis=1)
     cum_ret_SPY, avg_daily_ret_SPY, std_daily_ret_SPY, sharpe_ratio_SPY = assess_portfolio(portvals_SPX,sf =252)
@@ -188,4 +172,8 @@ def test_code():
     print "Final Portfolio Value: {}".format(portvals[-1])
 
 if __name__ == "__main__":
-    test_code()
+    start_date= dt.datetime(2011,01,14)
+    end_date = dt.datetime(2011,12,14)
+    of= "./orders/orders2.csv"
+    test_code(start_date,end_date, of)
+    #test_code(dt.datetime(2011,01,10), dt.datetime(2011,12,20), "./orders/orders.csv")
