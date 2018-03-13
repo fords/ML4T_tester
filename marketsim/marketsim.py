@@ -33,11 +33,9 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
                 #skiprows=[0]\
                 )
     orders_df.sort_index(inplace=True)
-
     dates = pd.date_range(min(orders_df.index), max(orders_df.index))
     symbols = []  # array
     symbols = list(set(orders_df['Symbol']))
-
     prices = get_data(symbols, dates)
 
     cash_columns = ['Cash']
@@ -61,7 +59,6 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
             trades.loc[i][symbols] = trades.loc[i][symbols] + (1 * shares)
         comission_val.loc[i]['Commission'] = comission_val.loc[i]['Commission'] + commission
         impact_val.loc[i]['Impact'] = impact_val.loc[i]['Impact'] + (prices.loc[i][symbols] * shares * impact)
-
 
     temp_df = prices * trades
     trades['Cash'] = -1.0 * temp_df.sum(axis = 1)
