@@ -113,12 +113,12 @@ def compute_cumu_returns(df):
     return cumulative_df
 
 
-def test_code():
+def test_code(start_date= dt.datetime(2011,01,14), end_date = dt.datetime(2011,12,14), of= "./orders/orders2.csv" ):
     # this is a helper function you can use to test your code
     # note that during autograding his function will not be called.
     # Define input parameters
 
-    of = "./orders/orders2.csv"
+    #of = "./orders/orders2.csv"
     sv = 1000000
 
     # Process orders
@@ -130,8 +130,8 @@ def test_code():
 
     # Get portfolio stats
     # Here we just fake the data. you should use your code from previous assignments.
-    start_date = dt.datetime(2011,01,14)
-    end_date = dt.datetime(2011,12,14)
+    #start_date = dt.datetime(2011,01,14)
+    #end_date = dt.datetime(2011,12,14)
     cum_ret, avg_daily_ret, std_daily_ret, sharpe_ratio   = assess_portfolio(portvals, sf =245)
     prices_SPX = get_data(['$SPX'] , pd.date_range(start_date, end_date))
     prices_SPX = prices_SPX[['$SPX']]
@@ -169,4 +169,8 @@ def test_code():
     print "Final Portfolio Value: {}".format(portvals[-1])
 
 if __name__ == "__main__":
-    test_code()
+    start_date= dt.datetime(2011,01,14)
+    end_date = dt.datetime(2011,12,14)
+    of= "./orders/orders2.csv"
+    test_code(start_date,end_date, of)
+    #test_code(dt.datetime(2011,01,10), dt.datetime(2011,12,20), "./orders/orders.csv")
