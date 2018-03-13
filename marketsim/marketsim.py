@@ -38,16 +38,14 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
     symbols = list(set(orders_df['Symbol']))
     prices = get_data(symbols, dates)
 
-    cash_columns = ['Cash']
-    commission_col = ['Commission']
-    impact_col = ['Impact']
-    cash_df = pd.DataFrame( index = dates, columns = cash_columns)
+
+    cash_df = pd.DataFrame( index = dates, columns = ['Cash'])
     cash_df = cash_df.fillna(1.000)
     prices = prices.join(cash_df)
     trades = pd.DataFrame(.0, columns = prices.columns, index = prices.index)
-    comission_df = pd.DataFrame(index = prices.index, columns = commission_col)
+    comission_df = pd.DataFrame(index = prices.index, columns = ['Commission'])
     comission_df = comission_df.fillna(.00)
-    impact_df = pd.DataFrame(index = prices.index, columns = impact_col)
+    impact_df = pd.DataFrame(index = prices.index, columns = ['Impact'])
     impact_df = impact_df.fillna(.00)
 
     for i, iterrows in orders_df.iterrows():
