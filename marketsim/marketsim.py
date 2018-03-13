@@ -45,10 +45,10 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
     cash_df = cash_df.fillna(1.000)
     prices = prices.join(cash_df)
     trades = pd.DataFrame(.0, columns = prices.columns, index = prices.index)
-    comission_val = pd.DataFrame(index = prices.index, columns = commission_col)
-    comission_val = comission_val.fillna(.00)
-    impact_val = pd.DataFrame(index = prices.index, columns = impact_col)
-    impact_val = impact_val.fillna(.00)
+    comission_df = pd.DataFrame(index = prices.index, columns = commission_col)
+    comission_df = comission_df.fillna(.00)
+    impact_df = pd.DataFrame(index = prices.index, columns = impact_col)
+    impact_df = impact_df.fillna(.00)
 
     for i, iterrows in orders_df.iterrows():
         shares = iterrows['Shares']
@@ -57,12 +57,12 @@ def compute_portvals(orders_file = "./orders/orders.csv", start_val = 1000000, c
             trades.loc[i][symbols] = trades.loc[i][symbols] + (-1 * shares)
         elif (iterrows['Order'] == 'BUY'):
             trades.loc[i][symbols] = trades.loc[i][symbols] + (1 * shares)
-        comission_val.loc[i]['Commission'] = comission_val.loc[i]['Commission'] + commission
-        impact_val.loc[i]['Impact'] = impact_val.loc[i]['Impact'] + (prices.loc[i][symbols] * shares * impact)
+        comission_df.loc[i]['Commission'] = comission_df.loc[i]['Commission'] + commission
+        impact_df.loc[i]['Impact'] = impact_df.loc[i]['Impact'] + (prices.loc[i][symbols] * shares * impact)
 
     temp_df = prices * trades
     trades['Cash'] = -1.0 * temp_df.sum(axis = 1)
-    trades['Cash'] = trades['Cash'] - comission_val['Commission'] - impact_val['Impact']
+    trades['Cash'] = trades['Cash'] - comission_df['Commission'] - impact_df['Impact']
     holdings = pd.DataFrame( .0, columns = trades.columns, index = trades.index)
     holdings.loc[min(trades.index), 'Cash'] = start_val   # start_date = min(trades.index)
     holdings = holdings + trades
