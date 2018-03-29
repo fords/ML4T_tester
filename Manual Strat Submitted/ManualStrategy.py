@@ -4,7 +4,7 @@ import numpy as np
 import datetime as dt
 import matplotlib.pyplot as plt
 import marketsimcode as msim
-plt.switch_backend('agg')
+#plt.switch_backend('agg')
 def author():
     return 'zwin3'
 
