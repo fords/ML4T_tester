@@ -4,7 +4,7 @@ import datetime as dt
 import os
 import matplotlib.pyplot as plt
 from util import get_data, plot_data
-
+plt.switch_backend('agg')
 def author():
     return 'zwin3'
 

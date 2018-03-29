@@ -4,7 +4,7 @@ import datetime as dt
 import matplotlib.pyplot as plt
 import marketsimcode as msim
 from util import get_data, plot_data
-
+plt.switch_backend('agg')
 def bb_value( vals, window_size):
     return (vals - vals.rolling(window_size).mean())/(2*vals.rolling(window_size).std())
 
