@@ -18,18 +18,35 @@ class QLearner(object):
         verbose = False):
 
         self.verbose = verbose
-        self.num_states = num_states
-        self.num_actions = num_actions
         self.s = 0
         self.a = 0
-        self.dyna = dyna
         self.alpha = alpha
         self.gamma = gamma
         self.rar = rar
         self.radr = radr
-        self.q_table = (2 * np.random.rand(num_states, num_actions)) - 1
+        self.dyna = dyna
+        self.Q = np.zeros(shape=(num_states, num_actions))
 
-    def querysetstate(self, s):
+        if dyna != 0:
+            self.T_c = np.zeros(shape=(num_states, num_actions, num_states))
+            self.T_c.fill(0.0001) # small value is to prevent divide by zero errors
+            self.T = self.T_c/np.sum(self.T_c, axis=2, keepdims=True)
+
+            self.R = self.Q.copy()
+            self.R.fill(-1.0) # piazza solution, not sure why this works
+
+    def get_Q(self):
+        return(self.Q)
+
+    def get_T(self):
+        return(self.T)
+
+    def get_R(self):
+        return(self.R)
+
+    def update_Q(self,s,a,s_prime,r):
+        """Updates the Q Table based on the new state and reward of the query, returns a Q Table"""
+        return((1-self.alpha) * self.Q[s][a] + self.alpha*(r + self.gamma * self.Q[s_prime][np.argmax(self.Q[s_prime])]))    def querysetstate(self, s):
         """
         @summary: Update the state without updating the Q-table
         @param s: The new state
