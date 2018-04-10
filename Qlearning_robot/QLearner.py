@@ -62,8 +62,10 @@ class QLearner(object):
 
         action = rand.randint(0, self.num_actions-1)
         if self.verbose: print "s =", s_prime,"a =",action,"r =",r
-
-        max = -1
+        if action < self.rar:
+            return rand.randint(0, self.num_actions)
+        if self.verbose: print "s =", s,"a =",action
+        max = -100
         for indx, val in enumerate(self.Qtable[s_prime]):
             if val > max:
                 max = val
@@ -72,9 +74,7 @@ class QLearner(object):
                                        self.alpha * (r + self.gamma * self.Qtable[s_prime][action])
 
         self.rar *=  self.radr
-        self.s = s_prime 
-        self.Qtable[self.s, self.a] = (1 - self.alpha) * self.Qtable[self.s, self.a] \
-                            + self.alpha * (r + self.gamma* self.Qtable[s_prime, self.Qtable[s_prime, :].argmax()])
+        self.s = s_prime
         # Update Qtable
         if self.dyna > 0:
             self.Tc[self.s, self.a, s_prime]  =  self.Tc[self.s, self.a, s_prime] + 1
