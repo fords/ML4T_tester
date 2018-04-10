@@ -27,7 +27,7 @@ class QLearner(object):
         self.gamma = gamma
         self.rar = rar
         self.radr = radr
-        self.Q = np.random.uniform(low = -1.0, high = 1.0, size = (num_states,num_actions))
+        self.Qtable = np.zeros(shape=(num_states, num_actions))
 
         self.TC = np.zeros([self.num_states, num_actions, num_states])
         self.TC.fill(0.000001)
@@ -48,7 +48,7 @@ class QLearner(object):
         if rand.uniform(0.0, 1.0) < self.rar:
             action = rand.randint(0, self.num_actions - 1)
         else:
-            action = self.Q[s, :].argmax()
+            action = self.Qtable[s, :].argmax()
         return action
 
     def query(self,s_prime,r):
@@ -58,15 +58,15 @@ class QLearner(object):
         @param r: The ne state
         @returns: The selected action
         """
-        prand = np.random.random()
-        if prand < self.rar:
+
+        if rand.uniform(0.0, 1.0) < self.rar:
             action = rand.randint(0, self.num_actions-1)
         else:
-            action = self.Q[s_prime,:].argmax()
-        self.rar = self.rar * self.radr
+            action = self.Qtable[s_prime,:].argmax()
+        self.rar *=  self.radr
 
-        self.Q[self.s, self.a] = (1 - self.alpha)*self.Q[self.s, self.a] + self.alpha * (r + self.gamma * self.Q[s_prime, :].max())
-
+        self.Qtable[self.s, self.a] = (1 - self.alpha) * self.Qtable[self.s, self.a] \
+                            + self.alpha * (r + self.gamma* self.Qtable[s_prime, self.Qtable[s_prime, :].argmax()])
         if self.dyna > 0:
 
             self.TC[self.s, self.a, s_prime] = self.TC[self.s, self.a, s_prime] + 1
@@ -78,7 +78,7 @@ class QLearner(object):
                 exp = rand.choice(self.experience)
                 sp = self.T[exp[0],exp[1],:].argmax()
                 r = self.R[exp[0],exp[1]]
-                self.Q[exp[0], exp[1]] = (1 - self.alpha)*self.Q[exp[0], exp[1]] + self.alpha * (r + self.gamma * self.Q[sp, :].max())
+                self.Qtable[exp[0], exp[1]] = (1 - self.alpha)*self.Qtable[exp[0], exp[1]] + self.alpha * (r + self.gamma * self.Qtable[sp, :].max())
 
         self.a = action
         self.s = s_prime
