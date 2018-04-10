@@ -59,8 +59,8 @@ class QLearner(object):
         @param r: The ne state
         @returns: The selected action
         """
-
-        if rand.uniform(0.0, 1.0) < self.rar:
+        action = rand.random()
+        if rand.uniform(0.00, 1.00) < self.rar:
             action = rand.randint(0, self.num_actions-1)
         else:
             max = -1
