@@ -46,7 +46,9 @@ class QLearner(object):
 
     def update_Q(self,s,a,s_prime,r):
         """Updates the Q Table based on the new state and reward of the query, returns a Q Table"""
-        return((1-self.alpha) * self.Q[s][a] + self.alpha*(r + self.gamma * self.Q[s_prime][np.argmax(self.Q[s_prime])]))    def querysetstate(self, s):
+        return((1-self.alpha) * self.Q[s][a] + self.alpha*(r + self.gamma * self.Q[s_prime][np.argmax(self.Q[s_prime])]))
+
+    def querysetstate(self, s):
         """
         @summary: Update the state without updating the Q-table
         @param s: The new state
