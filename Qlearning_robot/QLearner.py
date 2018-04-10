@@ -28,7 +28,8 @@ class QLearner(object):
         self.rar = rar
         self.radr = radr
         self.Qtable = np.zeros(shape=(num_states, num_actions))
-
+        self.R = np.zeros(shape=(num_states, num_actions))
+        self.T = {}
     def querysetstate(self, s):
         """
         @summary: Update the state without updating the Q-table
@@ -53,17 +54,37 @@ class QLearner(object):
         self.Qtable[self.s, self.a] = (1 - self.alpha) * self.Qtable[self.s, self.a] \
                                     + self.alpha * (r + self.gamma* self.Qtable[s_prime, self.Qtable[s_prime, :].argmax()])
         self.rar *= self.radr
-        self.s = s_prime
-        if rand.uniform(0.0, 1.0) < self.rar:
-            action = rand.randint(0, self.num_actions - 1 )
-            self.a = action
-        max = -100.0
-        for indx, val in enumerate(self.Qtable[s_prime]):
-            if val > max:
-                max = val
-                action = indx
-        self.a = action
+        if self.dyna > 0:
+
+            self.R[self.s, self.a] = (1 - self.alpha) * self.R[self.s, self.a] \
+                                        + self.alpha * r
+
+            if (self.s, self.a) in self.T:
+                if s_prime in self.T[(self.s, self.a)]:
+                    self.T[(self.s, self.a)][s_prime] += 1
+                else:
+                    self.T[(self.s, self.a)][s_prime] = 1
+            else:
+                self.T[(self.s, self.a)] = {s_prime: 1}
+
+            Q = deepcopy(self.Qtable)
+            for i in range(self.dyna):
+                s = rand.randint(0, self.num_states - 1)
+                a = rand.randint(0, self.num_actions - 1)
+                if (s, a) in self.T:
+                    # Find the most common s_prime as a result of taking a in s
+                    s_pr = max(self.T[(s, a)], key=lambda k: self.T[(s, a)][k])
+                    # Update the temporary Q table
+                    Q[s, a] = (1 - self.alpha) * Q[s, a] \
+                                + self.alpha * (self.R[s, a] + self.gamma
+                                * Q[s_pr, Q[s_pr, :].argmax()])
+
+            self.Qtable = deepcopy(Q)
+
+
+        action  = self.query_set_state(s_prime)
         return action
+
 
     def author(self):
         return 'zwin3'
