@@ -50,27 +50,20 @@ class QLearner(object):
         @param r: The ne state
         @returns: The selected action
         """
-
-
         self.Qtable[self.s, self.a] = (1 - self.alpha) * self.Qtable[self.s, self.a] \
-                                    + self.alpha * (r + self.gamma
-                                    * self.Qtable[s_prime, self.Qtable[s_prime, :].argmax()])
+                                    + self.alpha * (r + self.gamma* self.Qtable[s_prime, self.Qtable[s_prime, :].argmax()])
         self.rar *= self.radr
         self.s = s_prime
-        random_number = rand.random()
         if rand.uniform(0.0, 1.0) < self.rar:
             action = rand.randint(0, self.num_actions - 1 )
             self.a = action
-
-
-        max_value = -float("inf")
-        max_index = None
-        for index, value in enumerate(self.Qtable[s_prime]):
-            if value > max_value:
-                max_value = value
-                max_index = index
-        self.a = max_index
-        return max_index
+        max = -100.0
+        for indx, val in enumerate(self.Qtable[s_prime]):
+            if val > max:
+                max = val
+                action = indx
+        self.a = action
+        return action
 
     def author(self):
         return 'zwin3'
