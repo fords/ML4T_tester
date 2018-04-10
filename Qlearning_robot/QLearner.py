@@ -4,7 +4,7 @@ Template for implementing QLearner  (c) 2015 Tucker Balch
 
 import numpy as np
 import random as rand
-
+from copy import deecopy
 class QLearner(object):
 
     def __init__(self, \
