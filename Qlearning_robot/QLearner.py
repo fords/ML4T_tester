@@ -41,11 +41,15 @@ class QLearner(object):
         @returns: The selected action
         """
         self.s = s
-        rand_int = rand.random()
-        if rand.uniform(0.0, 1.0) < self.rar:
-            action = rand.randint(0, self.num_actions - 1)
-        else:
-            action = self.Qtable[s, :].argmax()
+        action = rand.random()
+        if action < self.rar:
+            return rand.randint(0, self.num_actions)
+        if self.verbose: print "s =", s,"a =",action
+        max = -1
+        for indx, val in enumerate(self.Qtable[s]):
+            if val > max:
+                max = val
+                action = indx
         return action
 
     def query(self,s_prime,r):
@@ -56,30 +60,38 @@ class QLearner(object):
         @returns: The selected action
         """
 
-        if rand.uniform(0.0, 1.0) < self.rar:
-            action = rand.randint(0, self.num_actions-1)
-        else:
-            action = self.Qtable[s_prime,:].argmax()
+        action = rand.randint(0, self.num_actions-1)
+        if self.verbose: print "s =", s_prime,"a =",action,"r =",r
+
+        max = -1
+        for indx, val in enumerate(self.Qtable[s_prime]):
+            if val > max:
+                max = val
+                action = indx
+        self.Qtable[self.s][self.a] =  (1 - self.alpha) * self.Qtable[self.s][self.a] +\
+                                       self.alpha * (r + self.gamma * self.Qtable[s_prime][action])
 
         self.rar *=  self.radr
+        self.s = s_prime 
         self.Qtable[self.s, self.a] = (1 - self.alpha) * self.Qtable[self.s, self.a] \
                             + self.alpha * (r + self.gamma* self.Qtable[s_prime, self.Qtable[s_prime, :].argmax()])
-
+        # Update Qtable
         if self.dyna > 0:
-            self.Tc[self.s, self.a, s_prime] = self.Tc[self.s, self.a, s_prime] + 1
-            self.Tsum[self.s, self.a, :] = self.Tc[self.s, self.a, :]/self.Tc[self.s, self.a, :].sum()
-            self.Reward[self.s,self.a] = (1 - self.alpha)*self.Reward[self.s, self.a] + self.alpha*r
+            self.Tc[self.s, self.a, s_prime]  =  self.Tc[self.s, self.a, s_prime] + 1
+            self.Tsum[self.s, self.a, :] = self.Tc[self.s, self.a, :] /  self.Tc[self.s, self.a, :].sum()
+            self.Reward[self.s,self.a] = (1 - self.alpha)  *  self.Reward[self.s, self.a] + self.alpha*r
             self.experience.append((self.s, self.a))
-
+        # Update Qtable when Dyna Q is finished and reward should be tracked
             for indx in range(self.dyna):
-                exp = rand.choice(self.experience)
-                sp = self.Tsum[exp[0], exp[1], :].argmax()
-                r = self.Reward[exp[0], exp[1]]
-                self.Qtable[exp[0], exp[1]] = (1 - self.alpha) * self.Qtable[exp[0], exp[1]] + \
-                                                self.alpha * (r + self.gamma * self.Qtable[sp, :].max())
+                experience = rand.choice(self.experience)
+                # Step and transition
+                Tsum = self.Tsum[experience[0], experience[1], :].argmax()
+                r = self.Reward[experience[0], experience[1]]
+                self.Qtable[experience[0], experience[1]] = (1 - self.alpha) * self.Qtable[experience[0], experience[1]] + \
+                                                self.alpha * (r + self.gamma * self.Qtable[Tsum, :].max())
         self.s = s_prime
         self.a = action
-        if self.verbose: print "s =", s_prime,"a =",action,"r =",r
+        #if self.verbose: print "s =", s_prime,"a =",action,"r =",r
         return action
 
     def author(self):
