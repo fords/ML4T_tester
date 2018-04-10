@@ -64,7 +64,7 @@ class QLearner(object):
             action = rand.randint(0, self.num_actions-1)
         else:
             max = -1
-            for indx, val in enumerate(self.Qtable[s]):
+            for indx, val in enumerate(self.Qtable[s_prime]):
                 if val > max:
                     max = val
                     action = indx
