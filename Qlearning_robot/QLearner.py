@@ -37,9 +37,9 @@ class QLearner(object):
         """
         self.s = s
         random_number = rand.random()
-        if random_number < self.rar:
-            return rand.randint(0, self.num_actions)
-
+        if rand.uniform(0.0, 1.0) < self.rar:
+            action = rand.randint(0, self.num_actions - 1)
+            return action
         max_value = -float("inf")
         max_index = None
         for index, value in enumerate(self.q_table[s]):
@@ -68,8 +68,8 @@ class QLearner(object):
 
         self.s = s_prime
         random_number = rand.random()
-        if random_number < self.rar:
-            action = rand.randint(0, self.num_actions)
+        if rand.uniform(0.0, 1.0) < self.rar:
+            action = rand.randint(0, self.num_actions - 1 )
             self.a = action
 
         self.rar *= self.radr
