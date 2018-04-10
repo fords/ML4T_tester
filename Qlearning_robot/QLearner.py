@@ -36,51 +36,47 @@ class QLearner(object):
         @returns: The selected action
         """
         self.s = s
-        random_number = rand.random()
-        if rand.uniform(0.0, 1.0) < self.rar:
-            action = rand.randint(0, self.num_actions - 1)
-            return action
-        max_value = -float("inf")
-        max_index = None
-        for index, value in enumerate(self.q_table[s]):
-            if value > max_value:
-                max_value = value
-                max_index = index
-        return max_index
+        action = np.random.randint(0, self.Q.shape[1])
+        if self.verbose: print("s =", s,"a =",action)
+        return action
 
     def query(self,s_prime,r):
         """
         @summary: Update the Q table and return an action
         @param s_prime: The new state
-        @param r: The ne state
+        @param r: The reward
         @returns: The selected action
         """
+        s = self.s
+        a = self.a
+        num_states = self.Q.shape[0]
+        num_actions = self.Q.shape[1]
 
-        max_value = -float("inf")
-        max_index = None
-        for index, value in enumerate(self.q_table[s_prime]):
-            if value > max_value:
-                max_value = value
-                max_index = index
-        self.q_table[self.s][self.a] = \
-            (1 - self.alpha) * self.q_table[self.s][self.a] + \
-            self.alpha * (r + self.gamma * self.q_table[s_prime][max_index])
+        self.Q[s][a] = self.update_Q(s, a, s_prime, r)
+
+        if np.random.randint(0,101)/100 > self.rar:
+            action = np.random.randint(0, num_actions)
+        else:
+            action = np.argmax(self.Q[s_prime])
+        self.rar *= self.radr
+
+        if self.dyna != 0:
+            self.T_c[s][a][s_prime] += 1
+            self.T = self.T_c/np.sum(self.T_c, axis=2, keepdims=True)
+            self.R[s][a] = (1-self.alpha) * self.R[s][a] + (self.alpha * r)
+
+            for _ in range(self.dyna):
+                s_dyna  = np.random.randint(0, num_states)
+                a_dyna  = np.random.randint(0, num_actions)
+                s_prime_dyna = np.random.multinomial(1, self.T[s_dyna][a_dyna]).argmax()
+                r_dyna = self.R[s_dyna][a_dyna]
+                self.Q[s_dyna][a_dyna] = self.update_Q(s_dyna, a_dyna, s_prime_dyna, r_dyna)
 
         self.s = s_prime
-        random_number = rand.random()
-        if rand.uniform(0.0, 1.0) < self.rar:
-            action = rand.randint(0, self.num_actions - 1 )
-            self.a = action
+        self.a = action
 
-        self.rar *= self.radr
-        max_value = -float("inf")
-        max_index = None
-        for index, value in enumerate(self.q_table[s_prime]):
-            if value > max_value:
-                max_value = value
-                max_index = index
-        self.a = max_index
-        return max_index
+        if self.verbose: print("s =", s_prime,"a =", action ,"r =",r)
+        return action
 
     def author(self):
         return 'zwin3'
