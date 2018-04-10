@@ -29,13 +29,9 @@ class QLearner(object):
         self.radr = radr
         self.Qtable = np.zeros(shape=(num_states, num_actions))
 
-        self.TC = np.zeros([self.num_states, num_actions, num_states])
-        self.TC.fill(0.000001)
-
-        self.T = np.zeros([self.num_states, num_actions, num_states])
-        self.T = self.TC/(0.000001 * self.num_states)
-
-        self.R = np.zeros([self.num_states,self.num_actions])
+        self.TC = np.zeros(shape=(num_states, num_actions))
+        self.T = np.zeros(shape=(num_states, num_actions))
+        self.R = np.zeros(shape=(num_states, num_actions))
         self.experience = []
     def querysetstate(self, s):
         """
@@ -63,12 +59,13 @@ class QLearner(object):
             action = rand.randint(0, self.num_actions-1)
         else:
             action = self.Qtable[s_prime,:].argmax()
+
         self.rar *=  self.radr
 
         self.Qtable[self.s, self.a] = (1 - self.alpha) * self.Qtable[self.s, self.a] \
                             + self.alpha * (r + self.gamma* self.Qtable[s_prime, self.Qtable[s_prime, :].argmax()])
-        if self.dyna > 0:
 
+        if self.dyna > 0:
             self.TC[self.s, self.a, s_prime] = self.TC[self.s, self.a, s_prime] + 1
             self.T[self.s, self.a, :] = self.TC[self.s, self.a, :]/self.TC[self.s, self.a, :].sum()
             self.R[self.s,self.a] = (1 - self.alpha)*self.R[self.s, self.a] + self.alpha*r
