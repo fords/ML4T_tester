@@ -83,6 +83,7 @@ class QLearner(object):
 
 
         action  = self.querysetstate(s_prime)
+        self.rar *= self.radr
         return action
 
 
