@@ -27,7 +27,7 @@ class QLearner(object):
         self.gamma = gamma
         self.rar = rar
         self.radr = radr
-        self.Qtable = (2 * np.random.rand(num_states, num_actions)) - 1
+        self.q_table = (2 * np.random.rand(num_states, num_actions)) - 1
 
     def querysetstate(self, s):
         """
