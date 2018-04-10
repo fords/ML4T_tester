@@ -36,16 +36,17 @@ class QLearner(object):
         @returns: The selected action
         """
         self.s = s
-        action = rand.random()
-        if action < self.rar:
+        random_number = rand.random()
+        if random_number < self.rar:
             return rand.randint(0, self.num_actions)
-        if self.verbose: print "s =", s,"a =",action
-        max = -1
-        for indx, val in enumerate(self.Qtable[s]):
-            if val > max:
-                max = val
-                action = indx
-        return action
+
+        max_value = -float("inf")
+        max_index = None
+        for index, value in enumerate(self.q_table[s]):
+            if value > max_value:
+                max_value = value
+                max_index = index
+        return max_index
 
     def query(self,s_prime,r):
         """
@@ -54,29 +55,32 @@ class QLearner(object):
         @param r: The ne state
         @returns: The selected action
         """
-        action = rand.randint(0, self.num_actions-1)
-        if self.verbose: print "s =", s_prime,"a =",action,"r =",r
 
-        max = -1
-        for indx, val in enumerate(self.Qtable[s_prime]):
-            if val > max:
-                max = val
-                action = indx
-        self.Qtable[self.s][self.a] =  (1 - self.alpha) * self.Qtable[self.s][self.a] +\
-                                       self.alpha * (r + self.gamma * self.Qtable[s_prime][action])
-        self.rar = self.radr
-        self.s = s_prime,
-        action = rand.random()
-        if action < self.rar:
-            action =  rand.randint(0, self.num_actions)
+        max_value = -float("inf")
+        max_index = None
+        for index, value in enumerate(self.q_table[s_prime]):
+            if value > max_value:
+                max_value = value
+                max_index = index
+        self.q_table[self.s][self.a] = \
+            (1 - self.alpha) * self.q_table[self.s][self.a] + \
+            self.alpha * (r + self.gamma * self.q_table[s_prime][max_index])
+
+        self.s = s_prime
+        random_number = rand.random()
+        if random_number < self.rar:
+            action = rand.randint(0, self.num_actions)
             self.a = action
-        max = -1
-        for indx, val in enumerate( self.Qtable[s_prime]):
-            if val > max:
-                max = val
-                action = indx
-            self.a = action
-        return action
+
+        self.rar *= self.radr
+        max_value = -float("inf")
+        max_index = None
+        for index, value in enumerate(self.q_table[s_prime]):
+            if value > max_value:
+                max_value = value
+                max_index = index
+        self.a = max_index
+        return max_index
 
     def author(self):
         return 'zwin3'
