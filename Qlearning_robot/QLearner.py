@@ -29,9 +29,9 @@ class QLearner(object):
         self.radr = radr
         self.Qtable = np.zeros(shape=(num_states, num_actions))
 
-        self.TC = np.zeros(shape=(num_states, num_actions))
-        self.T = np.zeros(shape=(num_states, num_actions))
-        self.R = np.zeros(shape=(num_states, num_actions))
+        self.TC = np.zeros([self.num_states, num_actions, num_states])
+        self.T = np.zeros([self.num_states, num_actions, num_states])
+        self.R = np.zeros([self.num_states,self.num_actions])
         self.experience = []
     def querysetstate(self, s):
         """
