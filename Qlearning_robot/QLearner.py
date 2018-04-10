@@ -40,7 +40,7 @@ class QLearner(object):
         if rand.uniform(0.0, 1.0) < self.rar:
             action = rand.randint(0, self.num_actions - 1)
         else:
-            action = self.Q[s, :].argmax()
+            action = self.Qtable[s, :].argmax()
         return action
 
     def query(self,s_prime,r):
@@ -51,7 +51,7 @@ class QLearner(object):
         @returns: The selected action
         """
 
-        
+
         self.Qtable[self.s, self.a] = (1 - self.alpha) * self.Qtable[self.s, self.a] \
                                     + self.alpha * (r + self.gamma
                                     * self.Qtable[s_prime, self.Qtable[s_prime, :].argmax()])
