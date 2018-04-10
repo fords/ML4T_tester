@@ -82,7 +82,7 @@ class QLearner(object):
             self.Qtable = deepcopy(Q)
 
 
-        action  = self.query_set_state(s_prime)
+        action  = self.querysetstate(s_prime)
         return action
 
 
