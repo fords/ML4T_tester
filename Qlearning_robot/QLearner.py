@@ -59,15 +59,11 @@ class QLearner(object):
         @param r: The ne state
         @returns: The selected action
         """
-        action = rand.random()
-        if rand.uniform(0.00, 1.00) < self.rar:
+
+        if rand.uniform(0.0, 1.0) < self.rar:
             action = rand.randint(0, self.num_actions-1)
         else:
-            max = -1
-            for indx, val in enumerate(self.Qtable[s_prime]):
-                if val > max:
-                    max = val
-                    action = indx
+            action = self.Qtable[s_prime,:].argmax()
 
         self.rar *=  self.radr
         self.Qtable[self.s, self.a] = (1 - self.alpha) * self.Qtable[self.s, self.a] \
