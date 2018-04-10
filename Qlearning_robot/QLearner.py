@@ -28,11 +28,12 @@ class QLearner(object):
         self.rar = rar
         self.radr = radr
         self.Qtable = np.zeros(shape=(num_states, num_actions))
-
-        self.TC = np.zeros([self.num_states, num_actions, num_states])
-        self.T = np.zeros([self.num_states, num_actions, num_states])
-        self.R = np.zeros([self.num_states,self.num_actions])
+        self.Tc = np.zeros([self.num_states, num_actions, num_states])
+        self.Tsum = np.zeros([self.num_states, num_actions, num_states])
+        self.Reward = np.zeros([self.num_states,self.num_actions])
         self.experience = []
+        self.dict = {}
+
     def querysetstate(self, s):
         """
         @summary: Update the state without updating the Q-table
@@ -61,25 +62,23 @@ class QLearner(object):
             action = self.Qtable[s_prime,:].argmax()
 
         self.rar *=  self.radr
-
         self.Qtable[self.s, self.a] = (1 - self.alpha) * self.Qtable[self.s, self.a] \
                             + self.alpha * (r + self.gamma* self.Qtable[s_prime, self.Qtable[s_prime, :].argmax()])
 
         if self.dyna > 0:
-            self.TC[self.s, self.a, s_prime] = self.TC[self.s, self.a, s_prime] + 1
-            self.T[self.s, self.a, :] = self.TC[self.s, self.a, :]/self.TC[self.s, self.a, :].sum()
-            self.R[self.s,self.a] = (1 - self.alpha)*self.R[self.s, self.a] + self.alpha*r
+            self.Tc[self.s, self.a, s_prime] = self.Tc[self.s, self.a, s_prime] + 1
+            self.Tsum[self.s, self.a, :] = self.Tc[self.s, self.a, :]/self.Tc[self.s, self.a, :].sum()
+            self.Reward[self.s,self.a] = (1 - self.alpha)*self.Reward[self.s, self.a] + self.alpha*r
             self.experience.append((self.s, self.a))
 
-            for i in range(0,self.dyna):
+            for indx in range(self.dyna):
                 exp = rand.choice(self.experience)
-                sp = self.T[exp[0],exp[1],:].argmax()
-                r = self.R[exp[0],exp[1]]
-                self.Qtable[exp[0], exp[1]] = (1 - self.alpha)*self.Qtable[exp[0], exp[1]] + self.alpha * (r + self.gamma * self.Qtable[sp, :].max())
-
-        self.a = action
+                sp = self.Tsum[exp[0], exp[1], :].argmax()
+                r = self.Reward[exp[0], exp[1]]
+                self.Qtable[exp[0], exp[1]] = (1 - self.alpha) * self.Qtable[exp[0], exp[1]] + \
+                                                self.alpha * (r + self.gamma * self.Qtable[sp, :].max())
         self.s = s_prime
-
+        self.a = action
         if self.verbose: print "s =", s_prime,"a =",action,"r =",r
         return action
 
